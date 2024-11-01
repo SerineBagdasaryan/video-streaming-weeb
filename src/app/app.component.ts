@@ -43,13 +43,13 @@ export class AppComponent implements OnInit {
         this.socketService.sendVideoData(event.data, RecordingTypes.camera);
       }
     };
-    this.mediaRecorder.start(100);
+    this.mediaRecorder.start(1000);
     this.screenRecorder.ondataavailable = (event) => {
       if (event.data.size > 0) {
         this.socketService.sendVideoData(event.data, RecordingTypes.screen);
       }
     };
-    this.screenRecorder.start(100);
+    this.screenRecorder.start(1000);
   }
   stopStreaming() {
     // Stop media recorder streams
