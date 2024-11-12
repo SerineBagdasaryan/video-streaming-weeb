@@ -1,17 +1,10 @@
-<!--<div id="container">-->
-<!--  <h1>Node-WebRTC Video Chat</h1>-->
-<!--  <div id="join-screen">-->
-<!--    <input type="text" id="room-name" placeholder="Enter Room Name">-->
-<!--    <button id="join-btn">Join</button>-->
-<!--  </div>-->
-<!--  <div id="video-chat" style="display: none;">-->
-<!--    <video id="local-video" autoplay playsinline></video>-->
-<!--    <div id="remote-videos"></div>-->
-<!--    <button id="leave-btn">Leave</button>-->
-<!--  </div>-->
-<!--</div>-->
 <div>
   <video #video autoplay></video>
   <button (click)="stopStreaming()">Stop Streaming</button>
+</div>
+<div>
+  <p class="error" *ngFor="let item of recordings$ | async">
+    <video *ngIf="item?.filePath" [src]="item.filePath" controls></video>
+  </p>
 </div>
 <router-outlet></router-outlet>

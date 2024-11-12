@@ -14,6 +14,10 @@ export class SocketService {
     },
   });
   constructor() {
+    this.socket.on('error', (error) => {
+      console.error('Socket error:', error.message);
+      this.socket.disconnect();
+    });
     this.socket.connect();
   }
   sendVideoData(data: Blob, recordingType: RecordingTypes ): void {
