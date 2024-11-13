@@ -22,36 +22,23 @@ export class AppComponent implements OnInit {
   private mediaStream!: MediaStream;
   private screenRecorder!: MediaRecorder;
   private screenStream!: MediaStream;
-  private userId: number = 4;
-  public destroyRef: DestroyRef = inject(DestroyRef);
-  public recordings$!: Observable<Recording[] | null>;
+  private userId: number = 1;
+  public recordings$!: Observable<PaginatedResponse>;
   public take: number = 10;
   public skip: number = 0;
   constructor(private socketService: SocketService,
               private appService: AppService) {
-    this.recordings$ = this.appService.getRecordings$();
+    this.recordings$ = this.appService.getRecordings(this.take, this.skip, this.userId);
   }
 
   ngOnInit(): void {
     this._initializeSign();
-    this.getRecordings();
     this.startStreaming();
   }
   private _initializeSign(): void {
     this.appService.sign(this.userId).subscribe((res: any) => {
       localStorage.setItem('token', res.data.accessToken);
     })
-  }
-  private getRecordings() {
-      this.appService.getRecordings(this.take, this.skip, this.userId)
-        .pipe(
-          (takeUntilDestroyed(this.destroyRef))
-        )
-        .subscribe(
-            (response: PaginatedResponse) => {
-            this.appService.setRecordings(response?.data);
-          },
-        );
   }
   async startStreaming(): Promise<void> {
     this.mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true});

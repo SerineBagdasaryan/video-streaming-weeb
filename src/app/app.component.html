@@ -3,8 +3,16 @@
   <button (click)="stopStreaming()">Stop Streaming</button>
 </div>
 <div>
-  <p class="error" *ngFor="let item of recordings$ | async">
-    <video *ngIf="item?.filePath" [src]="item.filePath" controls></video>
-  </p>
+  <div *ngIf="recordings$ | async as paginatedResponse">
+    <ng-container *ngIf="paginatedResponse?.data?.length; else noRecordings">
+      <p class="error" *ngFor="let item of paginatedResponse.data">
+        <video *ngIf="item?.filePath" [src]="item.filePath" controls></video>
+      </p>
+    </ng-container>
+    <ng-template #noRecordings>
+      <p>No recordings found.</p>
+    </ng-template>
+  </div>
+
 </div>
 <router-outlet></router-outlet>
