@@ -1,6 +1,8 @@
 <div>
   <video #video autoplay></video>
-  <button (click)="stopStreaming()">Stop Streaming</button>
+
+  <button (click)="startStreaming()" [disabled]="isRecording">Start Recording</button>
+  <button (click)="stopStreaming()" [disabled]="!isRecording">End Recording</button>
 </div>
 <div>
   <div *ngIf="recordings$ | async as paginatedResponse">

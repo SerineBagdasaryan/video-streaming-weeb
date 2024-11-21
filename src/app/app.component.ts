@@ -26,6 +26,7 @@ export class AppComponent implements OnInit {
   public recordings$!: Observable<PaginatedResponse>;
   public take: number = 10;
   public skip: number = 0;
+  public isRecording = false;
   constructor(private socketService: SocketService,
               private appService: AppService) {
     this.recordings$ = this.appService.getRecordings(this.take, this.skip, this.userId);
@@ -33,7 +34,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this._initializeSign();
-    this.startStreaming();
   }
   private _initializeSign(): void {
     this.appService.sign(this.userId).subscribe((res: any) => {
@@ -41,23 +41,26 @@ export class AppComponent implements OnInit {
     })
   }
   async startStreaming(): Promise<void> {
-    this.mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true});
-    this.screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-    this.videoRef.nativeElement.srcObject = this.mediaStream;
-    this.mediaRecorder = new MediaRecorder(this.mediaStream, { mimeType: 'video/webm' });
-    this.screenRecorder = new MediaRecorder(this.screenStream, { mimeType: 'video/webm' });
-    this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
-      if (event.data.size > 0) {
-        this.socketService.sendVideoData(event.data, RecordingTypes.camera);
-      }
-    };
-    this.mediaRecorder.start(1000);
-    this.screenRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        this.socketService.sendVideoData(event.data, RecordingTypes.screen);
-      }
-    };
-    this.screenRecorder.start(1000);
+    if (!this.isRecording) {
+      this.isRecording = true;
+      this.mediaStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+      this.screenStream = await navigator.mediaDevices.getDisplayMedia({video: true});
+      this.videoRef.nativeElement.srcObject = this.mediaStream;
+      this.mediaRecorder = new MediaRecorder(this.mediaStream, {mimeType: 'video/webm'});
+      this.screenRecorder = new MediaRecorder(this.screenStream, {mimeType: 'video/webm'});
+      this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data.size > 0) {
+          this.socketService.sendVideoData(event.data, RecordingTypes.camera);
+        }
+      };
+      this.mediaRecorder.start(1000);
+      this.screenRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          this.socketService.sendVideoData(event.data, RecordingTypes.screen);
+        }
+      };
+      this.screenRecorder.start(1000);
+    }
   }
   stopStreaming(): void {
     this.mediaRecorder.stop();
